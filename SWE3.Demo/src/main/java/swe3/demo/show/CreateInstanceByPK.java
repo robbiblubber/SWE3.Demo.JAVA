@@ -5,8 +5,8 @@ import swe3.demo.test.*;
 
 
 
-/** This implementation shows how to read data from an entity. */
-public final class FieldsFromEntity 
+/** This class shows how to create a single instance with an ID. */
+public class CreateInstanceByPK 
 {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // public static methods                                                                                            //
@@ -15,14 +15,13 @@ public final class FieldsFromEntity
     /** Implements the demonstration. */
     public static void show()
     {
-        Entity ent = World.__getEntity(Teacher.class);
-        
-        for(Field i: ent.getFields())
+        try 
         {
-            System.out.print(i.getName() + " => " + ent.getTableName() + "." + i.getColumnName());
-            if(i.isPrimaryKey()) { System.out.print(" (pk)"); }
-            if(i.isForeignKey()) { System.out.print(" (fk)"); }
-            System.out.println();
-        }
+            World.connect("jdbc:sqlite:test/test.sqlite");
+        } 
+        catch (Exception ex) {}
+        
+        Teacher t = World.getObject(Teacher.class, "T0");
+        System.out.println(t.getID() + " => " + t.getName());
     }
 }

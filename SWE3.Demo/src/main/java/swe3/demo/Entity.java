@@ -14,7 +14,7 @@ public final class Entity
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     /** Primary keys. */
-    private Object[] _primaryKeys;
+    private Field[] _primaryKeys;
     
     /** Entity type. */
     private Class _entityType;
@@ -71,19 +71,19 @@ public final class Entity
                 f.setColumnType(fattr.getColumnType());
             }
             
-            if(i.getReturnType().equals(Void.class))
-            {
-                f.setSetMethod(i);
-                f.setFieldType(i.getParameters()[0].getType());
-            }
-            else
+            if(i.getParameters().length == 0)
             {
                 f.setGetMethod(i);
                 f.setFieldType(i.getReturnType());
             }
+            else
+            {
+                f.setSetMethod(i);
+                f.setFieldType(i.getParameters()[0].getType());
+            }
             
             if(f.getColumnName() == null) { f.setColumnName(f.getName().toUpperCase()); }
-            if(f.getColumnType() == null) { f.setColumnType(f.getFieldType()); }
+            if((f.getColumnType() == null) || (f.getColumnType().equals(Void.class))) { f.setColumnType(f.getFieldType()); }
             
             if(fattr.isPrimaryKey())
             {
@@ -176,7 +176,7 @@ public final class Entity
     
     /** Gets the primary keys.
      * @return Primary keys. */
-    public Object[] getPrimaryKeys()
+    public Field[] getPrimaryKeys()
     {
         return _primaryKeys;
     }
@@ -220,5 +220,31 @@ public final class Entity
     public Field[] getInternals()
     {
         return _internals;
+    }
+    
+    
+    /** Gets the entity SQL.
+     * @return SQL string. */
+    public String getSQL()
+    {
+        return getSQL(null);
+    }
+    
+    
+    /** Gets the entity SQL.
+     * @param prefix Prefix.
+     * @return SQL string. */
+    public String getSQL(String prefix)
+    {
+        if(prefix == null) { prefix = ""; }
+        String rval = "SELECT ";
+        for(int i = 0; i < _internals.length; i++)
+        {
+            if(i > 0) { rval += ", "; }
+            rval += prefix.trim() + _internals[i].getColumnName();
+        }
+        rval += (" FROM " + _tableName);
+        
+        return rval;
     }
 }

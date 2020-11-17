@@ -13,6 +13,9 @@ public class Program
      * @param args Arguments. */
     public static void main(String[] args) 
     {
-        FieldsFromEntity.show();
+        /*FieldsFromEntity.show();
+        */
+        
+        CreateInstanceByPK.show();
     }
 }

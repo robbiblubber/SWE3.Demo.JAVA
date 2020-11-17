@@ -9,6 +9,9 @@ public class Lazy<T> implements ILazy
     // protected members                                                                                                //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
+    /** Type. */
+    protected Class<T> _t;
+    
     /** Primary keys. */
     protected Object[] _pks;
     
@@ -25,9 +28,11 @@ public class Lazy<T> implements ILazy
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     /** Creates a new instance of this class.
+     * @param t Type.
      * @param pks Primary keys. */
-    public Lazy(Object... pks)
+    public Lazy(Class<T> t, Object... pks)
     {
+        _t = t;
         _pks = pks;
     }
     
@@ -41,7 +46,7 @@ public class Lazy<T> implements ILazy
      * @return Value. */
     public T getValue()
     {
-        if(!_initialized) { _value = World.<T>getObject(_pks); _initialized = true; }
+        if(!_initialized) { _value = World.<T>getObject(_t, _pks); _initialized = true; }
         return _value;
     }
     

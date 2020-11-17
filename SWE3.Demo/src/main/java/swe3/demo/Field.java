@@ -1,6 +1,9 @@
 package swe3.demo;
 
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collection;
 
 
 
@@ -249,5 +252,104 @@ public class Field
     public void setManyToMany(boolean value)
     {
         _isManyToMany = value;
+    }
+    
+    
+    /** Returns a database column type equivalent for a field type value.
+     * @param obj Object.
+     * @return Database type representation of the value. */
+    public Object toColumnType(Object obj)
+    {
+        if(_fieldType.equals(_columnType)) { return obj; }
+        
+        if(obj.getClass().equals(boolean.class))
+        {
+            if(_columnType.equals(int.class))   { return         (((boolean) obj) ? 1 : 0); }
+            if(_columnType.equals(short.class)) { return (short) (((boolean) obj) ? 1 : 0); }
+            if(_columnType.equals(long.class))  { return (long)  (((boolean) obj) ? 1 : 0); }
+        }
+        
+        return obj;
+    }
+    
+    
+    /** Returns a field type equivalent for a database column type value.
+     * @param obj Value.
+     * @return Field type representation of the value. */
+    public Object toFieldType(Object obj)
+    {
+        if(_fieldType.equals(boolean.class))
+        {
+            if(obj.getClass().equals(int.class))   { return (((int) obj)   != 0); }
+            if(obj.getClass().equals(short.class)) { return (((short) obj) != 0); }
+            if(obj.getClass().equals(long.class))  { return (((long) obj)  != 0); }
+        }
+        
+        if(_fieldType.equals(short.class)) { return (short) obj; }
+        if(_fieldType.equals(int.class))   { return (int)   obj; }
+        if(_fieldType.equals(long.class))  { return (long)  obj; }
+        
+        if(_fieldType.isEnum())
+        {
+            if(obj instanceof String) { return Enum.valueOf(_fieldType, (String) obj); }
+            return _fieldType.getEnumConstants()[(int) obj];
+        }
+        
+        if(_fieldType.equals(Calendar.class)) 
+        {
+            Calendar rval = Calendar.getInstance();
+            SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try 
+            {
+                rval.setTime(f.parse(obj.toString()));
+                return rval;
+            }
+            catch (Exception ex) {}
+        }
+        
+        return obj;
+    }
+    
+    
+    /** Gets the field value.
+     * @param obj Object.
+     * @return Value. */
+    public Object getValue(Object obj)
+    {
+        try 
+        {
+            return _get.invoke(obj);
+        } 
+        catch (Exception ex) { return null; }
+    }
+    
+    
+    /** Sets the field value.
+     * @param obj Object.
+     * @param value Value. */
+    public void setValue(Object obj, Object value) throws Exception
+    {
+        setValue(obj, value, null);
+    }
+    
+    
+    /** Sets the field value.
+     * @param obj Object.
+     * @param value Value.
+     * @param objects Cached objects. */
+    public void setValue(Object obj, Object value, Collection<Object> objects) throws Exception
+    {
+        if(_isFk)
+        {
+            if(_isExternal)
+            {
+                
+            }
+            else
+            {
+                
+            }
+        }
+        else { _set.invoke(obj, value); }
     }
 }
