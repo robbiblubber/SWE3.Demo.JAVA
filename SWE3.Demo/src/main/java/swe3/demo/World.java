@@ -1,5 +1,6 @@
 package swe3.demo;
 
+import java.lang.reflect.Array;
 import java.rmi.activation.Activator;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -141,6 +142,35 @@ public final class World
     }
     
     
+    /** Fills a list.
+     * @param t Type.
+     * @param list List.
+     * @param re Result set. */
+    protected static void _fillList(Class t, Collection list, ResultSet re)
+    {
+        _fillList(t, list, re, null);
+    }
+    
+    
+    /** Fills a list.
+     * @param t Type.
+     * @param list List.
+     * @param re Result set.
+     * @param objects Cached objects. */
+    protected static void _fillList(Class t, Collection list, ResultSet re, Collection objects)
+    {
+        try 
+        {
+            while(re.next()) 
+            {
+                list.add(_createObject(t, re, objects));
+            }
+        }
+        catch (Exception ex) {}
+    }
+    
+    
+    
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // public static methods                                                                                            //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,5 +227,31 @@ public final class World
             return (T) _createObject(t, pks);
         }
         catch (Exception ex) { return null; }
+    }
+    
+    
+    /** Returns an array of instances for an SQL query.
+     * @param <T> Type.
+     * @param t Type.
+     * @param sql SQL query.
+     * @return Instances. */
+    public static <T> T[] fromSQL(Class<T> t, String sql)
+    {
+        ArrayList<T> rval = new ArrayList<>();
+        
+        try 
+        {
+            PreparedStatement cmd = getConnection().prepareStatement(sql);
+
+            ResultSet re = cmd.executeQuery();
+            _fillList(t, rval, re);
+
+            re.close();
+            cmd.close();
+        }
+        catch (Exception ex) {}
+        
+        
+        return rval.toArray((T[]) Array.newInstance(t, 0));
     }
 }
