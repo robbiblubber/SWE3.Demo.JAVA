@@ -39,6 +39,28 @@ public class Lazy<T> implements ILazy
     
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // protected methods                                                                                                //
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    /** Gets the inner type.
+     * @return Type. */
+    protected Class _getInnerType()
+    {
+        return _t;
+    }
+    
+    
+    /** Sets the primary keys and resets the object.
+     * @param pks Primary keys. */
+    protected void _feed(Object... pks)
+    {
+        _pks = pks;
+        _initialized = false;
+    }
+    
+    
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // public methods                                                                                                   //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
@@ -46,7 +68,7 @@ public class Lazy<T> implements ILazy
      * @return Value. */
     public T getValue()
     {
-        if(!_initialized) { _value = World.<T>getObject(_t, _pks); _initialized = true; }
+        if(!_initialized) { _value = World.getObject(_t, _pks); _initialized = true; }
         return _value;
     }
     

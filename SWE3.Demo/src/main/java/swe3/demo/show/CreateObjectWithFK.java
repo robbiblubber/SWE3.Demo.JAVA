@@ -5,8 +5,8 @@ import swe3.demo.test.*;
 
 
 
-/** This implementation shows how to create framework objects from native SQL. */
-public final class SQLToFrameworkObjects 
+/** This class shows how to create an instance of an object with a foreign key. */
+public final class CreateObjectWithFK 
 {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // public static methods                                                                                            //
@@ -21,9 +21,9 @@ public final class SQLToFrameworkObjects
         } 
         catch (Exception ex) {}
         
-        for(Teacher i: World.fromSQL(Teacher.class, "SELECT * FROM TEACHERS WHERE ID != 'T1'"))
-        {
-            System.out.println(i.getID() + ": [" + i.getName() + "]");
-        }
+        SClass c = World.getObject(SClass.class, "C1");
+        
+        System.out.print(c.getID() + ": [" + c.getName() + "]");
+        System.out.println(" (Teacher: " + c.getTeacher().getName() + ")");
     }
 }

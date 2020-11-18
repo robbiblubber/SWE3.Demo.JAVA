@@ -61,7 +61,11 @@ public final class World
                     }
                 }
             } 
-            catch (Exception ex) { return null; }
+            catch (Exception ex) 
+            { 
+                int x = 0;
+                return null; 
+            }
         }
         return rval;
     }

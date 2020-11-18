@@ -1,6 +1,7 @@
 package swe3.demo;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -102,6 +103,7 @@ public class Field
     public void setGetMethod(Method value)
     {
         _get = value;
+        _get.setAccessible(true);
     }
     
     
@@ -117,6 +119,7 @@ public class Field
     public void setSetMethod(Method value)
     {
         _set = value;
+        _set.setAccessible(true);
     }
     
     
@@ -347,7 +350,15 @@ public class Field
             }
             else
             {
-                
+                if(Lazy.class.isAssignableFrom(_fieldType))
+                {
+                    Lazy lazy = (Lazy) _get.invoke(obj);
+                    lazy._feed(World.__getEntity(lazy._getInnerType()).getPrimaryKeys()[0].toFieldType(value));
+                }
+                else
+                {
+                    _set.invoke(obj, World._createObject(_fieldType, new Object[] { World.__getEntity(_fieldType).getPrimaryKeys()[0].toFieldType(value) }, objects));
+                }
             }
         }
         else { _set.invoke(obj, value); }
