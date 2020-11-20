@@ -20,7 +20,7 @@ public class SClass
     protected String _name;
     
     /** Teacher. */
-    protected Lazy<Teacher> _backTeacher = new Lazy<>(Teacher.class);
+    protected Lazy<Teacher> _backTeacher;
     
     
     
@@ -64,7 +64,7 @@ public class SClass
     
     /** Gets the class teacher.
      * @return Teacher. */
-    @fk(columnName = "KTEACHER", fieldName = "_backTeacher")
+    @fk(columnName = "KTEACHER", fieldName = "_backTeacher", columnType = Teacher.class)
     private Lazy<Teacher> _getBackTeacher()
     {
         return _backTeacher;
@@ -73,7 +73,7 @@ public class SClass
     
     /** Sets the class teacher.
      * @param value Teacher. */
-    @fk(columnName = "KTEACHER", fieldName = "_backTeacher")
+    @fk(fieldName = "_backTeacher")
     private void _setBackTeacher(Lazy<Teacher> value)
     {
         _backTeacher = value;

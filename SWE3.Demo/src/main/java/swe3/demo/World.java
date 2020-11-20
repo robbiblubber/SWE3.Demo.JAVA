@@ -1,7 +1,6 @@
 package swe3.demo;
 
 import java.lang.reflect.Array;
-import java.rmi.activation.Activator;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -57,13 +56,12 @@ public final class World
                 {
                     if(!i.isPrimaryKey())
                     {
-                        i.setValue(rval, i.toFieldType(re.getObject(i.getColumnName())));
+                        i.setValue(rval, i.toFieldType(i.isExternal() ? i.getEntity().getPrimaryKeys()[0].getColumnName() : re.getObject(i.getColumnName())));
                     }
                 }
             } 
             catch (Exception ex) 
             { 
-                int x = 0;
                 return null; 
             }
         }
@@ -169,6 +167,43 @@ public final class World
             {
                 list.add(_createObject(t, re, objects));
             }
+        }
+        catch (Exception ex) {}
+    }
+    
+    
+    /** Fills a list.
+     * @param t Type.
+     * @param list List.
+     * @param sql SQL query.
+     * @param parameters Parameters. */
+    protected static void _fillList(Class t, Collection list, String sql, Object[] parameters)
+    {
+        _fillList(t, list, sql, parameters, null);
+    }
+    
+    
+    /** Fills a list.
+     * @param t Type.
+     * @param list List.
+     * @param sql SQL query.
+     * @param parameters Parameters.
+     * @param objects Cached objects. */
+    protected static void _fillList(Class t, Collection list, String sql, Object[] parameters, Collection<Object> objects)
+    {
+        try 
+        {
+            PreparedStatement cmd = getConnection().prepareStatement(sql);
+            for(int i = 0; i < parameters.length; i++)
+            {
+                cmd.setObject(i + 1, parameters[i]);
+            }
+            
+            ResultSet re = cmd.executeQuery();
+            _fillList(t, list, re, objects);
+            
+            re.close();
+            cmd.close();
         }
         catch (Exception ex) {}
     }

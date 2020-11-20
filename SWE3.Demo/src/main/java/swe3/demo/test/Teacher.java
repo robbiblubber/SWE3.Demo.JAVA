@@ -1,7 +1,6 @@
 package swe3.demo.test;
 
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.*;
 import swe3.demo.annotations.*;
 
 
@@ -22,6 +21,7 @@ public class Teacher extends Person
     
     /** Classes. */
     protected ArrayList<SClass> _classes;
+    
     
     
     
@@ -60,5 +60,23 @@ public class Teacher extends Person
     public void setHireDate(Calendar value)
     {
         _hireDate = value;
+    }
+    
+    
+    /** Gets the teacher's classes.
+     * @return Classes. */
+    @fk(columnName = "KTEACHER", columnType = SClass.class)
+    public ArrayList<SClass> getClasses()
+    {
+        return _classes;
+    }
+    
+    
+    /** Sets the teacher's classes.
+     * @param value Classes. */
+    @fk(fieldName = "Classes")
+    private void _setClasses(ArrayList<SClass> value)
+    {
+        _classes = value;
     }
 }

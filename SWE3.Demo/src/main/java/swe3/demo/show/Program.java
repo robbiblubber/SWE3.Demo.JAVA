@@ -17,6 +17,7 @@ public class Program
         FieldsFromEntity.show();
         CreateInstanceByPK.show();
         SQLToFrameworkObjects.show();
+        CreateObjectWithFK.show();
         */
         
         CreateObjectWithFK.show();

@@ -1,7 +1,6 @@
 package swe3.demo;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -281,6 +280,12 @@ public class Field
      * @return Field type representation of the value. */
     public Object toFieldType(Object obj)
     {
+        if(_isFk)
+        { 
+            if(_isExternal) return World.__getEntity(_columnType).getPrimaryKeys()[0].toColumnType(obj); 
+            return _entity.getPrimaryKeys()[0].toColumnType(obj);
+        }
+        
         if(_fieldType.equals(boolean.class))
         {
             if(obj.getClass().equals(int.class))   { return (((int) obj)   != 0); }
@@ -352,8 +357,7 @@ public class Field
             {
                 if(Lazy.class.isAssignableFrom(_fieldType))
                 {
-                    Lazy lazy = (Lazy) _get.invoke(obj);
-                    lazy._feed(World.__getEntity(lazy._getInnerType()).getPrimaryKeys()[0].toFieldType(value));
+                    _set.invoke(obj, _fieldType.getDeclaredConstructor(_columnType.getClass(), Object[].class).newInstance(_columnType, new Object[] { value }));
                 }
                 else
                 {

@@ -66,7 +66,7 @@ public final class Entity
             {
                 f.setColumnName(fattr.getColumnName());
             }
-            if((fattr.getColumnType() != null) && (fattr.getColumnType().equals(Void.class)))
+            if((fattr.getColumnType() != null) && (!fattr.getColumnType().equals(Void.class)))
             {
                 f.setColumnType(fattr.getColumnType());
             }

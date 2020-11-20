@@ -50,15 +50,6 @@ public class Lazy<T> implements ILazy
     }
     
     
-    /** Sets the primary keys and resets the object.
-     * @param pks Primary keys. */
-    protected void _feed(Object... pks)
-    {
-        _pks = pks;
-        _initialized = false;
-    }
-    
-    
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // public methods                                                                                                   //

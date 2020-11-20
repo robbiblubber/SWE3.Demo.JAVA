@@ -2,12 +2,15 @@ package swe3.demo;
 
 import java.lang.reflect.Method;
 import swe3.demo.annotations.*;
+import swe3.demo.show.Program;
 
 
 
 /** Field annotation helper class. */
 final class __FieldAnnotation 
 {
+    Class _xxx = Program.class; // TODO: remove!
+    
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // private members                                                                                                  //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,9 +53,9 @@ final class __FieldAnnotation
         if(fann != null)
         {
             _isField = true;
-            _fieldName  = fann.fieldName();
-            _columnName = fann.columnName();
-            _columnType = fann.columnType();
+            if((fann.fieldName()  != null) && (!fann.fieldName().equals("")))  { _fieldName = fann.fieldName(); }
+            if((fann.columnName() != null) && (!fann.columnName().equals(""))) { _columnName = fann.columnName(); }
+            if((fann.columnType() != null) && (!fann.columnType().equals(Void.class))) { _columnType = fann.columnType(); }
         }
         
         pk pkann = m.getAnnotation(pk.class);
@@ -70,7 +73,11 @@ final class __FieldAnnotation
             _isField = _isFk = true;
             if((fkann.fieldName()  != null) && (!fkann.fieldName().equals(""))) { _fieldName = fkann.fieldName(); }
             if((fkann.columnName() != null) && (!fkann.columnName().equals(""))) { _columnName = fkann.columnName(); }
-            if((fkann.columnType() != null) && (!fkann.columnType().equals(Void.class))) { _columnType = fkann.columnType(); }
+            if((fkann.columnType() != null) && (!fkann.columnType().equals(Void.class))) 
+            { 
+                _columnType = fkann.columnType();
+                _xxx = fkann.columnType();
+            }
         }
     }
     
