@@ -4,7 +4,8 @@ import java.lang.annotation.*;
 
 
 
-/** This marks a field as foreign key. */
+/** This marks a field as foreign key.
+ *  Foreign keys need to set columnType to target class (may be omitted for simple foreign keys that are not lazy). */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface fk 
 {

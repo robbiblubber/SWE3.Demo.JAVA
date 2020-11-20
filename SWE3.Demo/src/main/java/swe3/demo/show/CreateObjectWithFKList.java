@@ -24,9 +24,14 @@ public class CreateObjectWithFKList
         Teacher t = World.getObject(Teacher.class, "T0");
         
         System.out.println(t.getID() + ": [" + t.getName() + "]");
-        for(SClass i: t.getClasses())
+        for(SClass i: t.getClasses())                                           // with eager loading
         {
             System.out.println("    " + i.getName() + " (class)");
+        }
+        
+        for(Course i: t.getCourses())                                           // with eager loading
+        {
+            System.out.println("    " + i.getName() + " (course)");
         }
     }
 }

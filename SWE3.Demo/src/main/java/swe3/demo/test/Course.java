@@ -1,13 +1,12 @@
 package swe3.demo.test;
 
-import swe3.demo.*;
 import swe3.demo.annotations.*;
 
 
 
-/** This class represents a class in the school model. */
-@entity(tableName = "CLASSES")
-public class SClass 
+/** This class represents a course in the school model. */
+@entity(tableName = "COURSES")
+public class Course 
 {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // protected members                                                                                                //
@@ -19,8 +18,11 @@ public class SClass
     /** Name. */
     protected String _name;
     
+    /** Active flag. */
+    protected boolean _active;
+    
     /** Teacher. */
-    protected Lazy<Teacher> _backTeacher;
+    protected Teacher _teacher;
     
     
     
@@ -28,7 +30,7 @@ public class SClass
     // public methods                                                                                                   //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
-    /** Gets the class ID.
+    /** Gets the course ID.
      * @return ID. */
     @field @pk
     public String getID()
@@ -36,7 +38,7 @@ public class SClass
         return _id;
     }    
     
-    /** Sets the class ID.
+    /** Sets the course ID.
      * @param value ID. */
     @field @pk
     public void setID(String value)
@@ -45,7 +47,7 @@ public class SClass
     }
     
     
-    /** Gets the class name.
+    /** Gets the course name.
      * @return Name. */
     @field
     public String getName()
@@ -53,7 +55,7 @@ public class SClass
         return _name;
     }
     
-    /** Sets the class name.
+    /** Sets the course name.
      * @param value Name. */
     @field
     public void setName(String value)
@@ -62,38 +64,20 @@ public class SClass
     }
     
     
-    /** Gets the class teacher.
+    /** Gets the course teacher.
      * @return Teacher. */
-    @fk(columnName = "KTEACHER", fieldName = "_backTeacher", columnType = Teacher.class)
-    private Lazy<Teacher> _getBackTeacher()
-    {
-        return _backTeacher;
-    }
-    
-    
-    /** Sets the class teacher.
-     * @param value Teacher. */
-    @fk(fieldName = "_backTeacher")
-    private void _setBackTeacher(Lazy<Teacher> value)
-    {
-        _backTeacher = value;
-    }
-    
-    
-    /** Gets the class teacher.
-     * @return Teacher. */
-    @ignore
+    @fk(columnName = "KTEACHER")
     public Teacher getTeacher()
     {
-        return _backTeacher.getValue();
+        return _teacher;
     }
     
     
-    /** Sets the class teacher.
+    /** Sets the course teacher.
      * @param value Teacher. */
-    @ignore
+    @fk
     public void setTeacher(Teacher value)
     {
-        _backTeacher.setValue(value);
+        _teacher = value;
     }
 }

@@ -1,6 +1,7 @@
 package swe3.demo.test;
 
 import java.util.*;
+import swe3.demo.*;
 import swe3.demo.annotations.*;
 
 
@@ -21,6 +22,9 @@ public class Teacher extends Person
     
     /** Classes. */
     protected ArrayList<SClass> _classes;
+    
+    /** Courses. */
+    protected LazyList<Course> _courses;
     
     
     
@@ -78,5 +82,23 @@ public class Teacher extends Person
     private void _setClasses(ArrayList<SClass> value)
     {
         _classes = value;
+    }
+    
+    
+    /** Gets the teacher's courses.
+     * @return Classes. */
+    @fk(columnName = "KTEACHER", columnType = Course.class)
+    public LazyList<Course> getCourses()
+    {
+        return _courses;
+    }
+    
+    
+    /** Sets the teacher's classes.
+     * @param value Classes. */
+    @fk(fieldName = "Courses")
+    private void _setCourses(LazyList<Course> value)
+    {
+        _courses = value;
     }
 }

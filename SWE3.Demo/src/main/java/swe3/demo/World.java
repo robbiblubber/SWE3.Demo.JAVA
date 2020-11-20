@@ -56,7 +56,7 @@ public final class World
                 {
                     if(!i.isPrimaryKey())
                     {
-                        i.setValue(rval, i.toFieldType(i.isExternal() ? i.getEntity().getPrimaryKeys()[0].getColumnName() : re.getObject(i.getColumnName())));
+                        i.setValue(rval, i.toFieldType(re.getObject(i.isExternal() ? i.getEntity().getPrimaryKeys()[0].getColumnName() : i.getColumnName())));
                     }
                 }
             } 

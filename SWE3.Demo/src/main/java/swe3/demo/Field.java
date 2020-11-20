@@ -351,7 +351,29 @@ public class Field
         {
             if(_isExternal)
             {
+                Entity rent = World.__getEntity(_columnType);
+                String sql = rent.getSQL() + " WHERE " + _columnName + " = ?";
+                Object[] parameters = new Object[] { _entity.getPrimaryKeys()[0].toFieldType(value) };
+                Object rval;
                 
+                if(_isManyToMany)
+                {
+                    sql = rent.getSQL("T.") + " WHERE EXISTS (SELECT * FROM " + _assignmentTable + " X " +
+                                              "WHERE X." + _remoteColumnName + " = T." + rent.getPrimaryKeys()[0].getColumnName() + " AND " +
+                                              "X." + _columnName + " = ?)";
+                }
+                
+                if(LazyList.class.isAssignableFrom(_fieldType))
+                {
+                    rval = _fieldType.getDeclaredConstructor(_columnType.getClass(), String.class, Object[].class).newInstance(_columnType, sql, parameters);
+                }
+                else
+                {
+                    rval = _fieldType.getDeclaredConstructor().newInstance();
+                    World._fillList(_columnType, (Collection) rval, sql, parameters, objects);
+                }
+                
+                _set.invoke(obj, rval);
             }
             else
             {

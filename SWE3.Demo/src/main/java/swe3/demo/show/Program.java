@@ -20,6 +20,6 @@ public class Program
         CreateObjectWithFK.show();
         */
         
-        CreateObjectWithFK.show();
+        CreateObjectWithFKList.show();
     }
 }
