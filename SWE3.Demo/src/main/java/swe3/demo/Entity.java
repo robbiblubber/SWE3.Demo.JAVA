@@ -94,10 +94,11 @@ public final class Entity
             if(fattr.isForeignKey())
             {
                 f.setForeignKey(true);
+                if(fattr.getManyToMany()) { f.setManyToMany(true); }
                 
                 f.setExternal(Iterable.class.isAssignableFrom(f.getFieldType()));
-                f.setAssignmentTable(fattr.getAssignmentTable());
-                f.setRemoteColumnName(fattr.getRemoteColumnName());
+                if((fattr.getAssignmentTable() != null) && (!fattr.getAssignmentTable().trim().equals(""))) f.setAssignmentTable(fattr.getAssignmentTable());
+                if((fattr.getRemoteColumnName()!= null) && (!fattr.getRemoteColumnName().trim().equals(""))) f.setRemoteColumnName(fattr.getRemoteColumnName());
             }
         }        
         _fields = fields.toArray(new Field[0]);

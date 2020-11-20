@@ -40,6 +40,7 @@ public final class World
     {
         Object rval = _getCachedObject(t, re, objects);
         
+        Field fld = null;
         if(rval == null)
         {
             if(objects == null) { objects = new ArrayList<>(); }
@@ -54,6 +55,7 @@ public final class World
                 
                 for(Field i: __getEntity(t).getFields())
                 {
+                    fld = i;
                     if(!i.isPrimaryKey())
                     {
                         i.setValue(rval, i.toFieldType(re.getObject(i.isExternal() ? i.getEntity().getPrimaryKeys()[0].getColumnName() : i.getColumnName())));

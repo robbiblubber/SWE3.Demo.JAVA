@@ -1,5 +1,6 @@
 package swe3.demo.test;
 
+import java.util.ArrayList;
 import swe3.demo.annotations.*;
 
 
@@ -23,6 +24,9 @@ public class Course
     
     /** Teacher. */
     protected Teacher _teacher;
+    
+    /** Students. */
+    protected ArrayList<Student> _students;
     
     
     
@@ -79,5 +83,23 @@ public class Course
     public void setTeacher(Teacher value)
     {
         _teacher = value;
+    }
+    
+    
+    /** Gets the course students.
+     * @return Students. */
+    @fk(assignmentTable = "STUDENT_COURSES", columnName = "KCOURSE", remoteColumnName = "KSTUDENT", columnType = Student.class)
+    public ArrayList<Student> getStudents()
+    {
+        return _students;
+    }
+    
+    
+    /** Sets the course students.
+     * @param value Students. */
+    @fk(fieldName = "Students")
+    private void _setStudents(ArrayList<Student> value)
+    {
+        _students = value;
     }
 }

@@ -9,8 +9,6 @@ import swe3.demo.show.Program;
 /** Field annotation helper class. */
 final class __FieldAnnotation 
 {
-    Class _xxx = Program.class; // TODO: remove!
-    
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // private members                                                                                                  //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,11 +71,10 @@ final class __FieldAnnotation
             _isField = _isFk = true;
             if((fkann.fieldName()  != null) && (!fkann.fieldName().equals(""))) { _fieldName = fkann.fieldName(); }
             if((fkann.columnName() != null) && (!fkann.columnName().equals(""))) { _columnName = fkann.columnName(); }
-            if((fkann.columnType() != null) && (!fkann.columnType().equals(Void.class))) 
-            { 
-                _columnType = fkann.columnType();
-                _xxx = fkann.columnType();
-            }
+            if((fkann.columnType() != null) && (!fkann.columnType().equals(Void.class))) { _columnType = fkann.columnType(); }
+            
+            _assignmentTable = fkann.assignmentTable();
+            _remoteColumnName = fkann.remoteColumnName();
         }
     }
     
@@ -116,6 +113,14 @@ final class __FieldAnnotation
     public String getAssignmentTable()
     {
         return _assignmentTable;
+    }
+    
+    
+    /** Gets if a foreign key is m:n.
+     * @return Returns TRUE for m:n, otherwise returns FALSE. */
+    public boolean getManyToMany()
+    {
+        return (!((_assignmentTable == null) || (_assignmentTable.trim().equals(""))));
     }
     
     

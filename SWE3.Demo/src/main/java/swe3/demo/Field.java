@@ -358,7 +358,7 @@ public class Field
                 
                 if(_isManyToMany)
                 {
-                    sql = rent.getSQL("T.") + " WHERE EXISTS (SELECT * FROM " + _assignmentTable + " X " +
+                    sql = rent.getSQL("T.") + " T WHERE EXISTS (SELECT * FROM " + _assignmentTable + " X " +
                                               "WHERE X." + _remoteColumnName + " = T." + rent.getPrimaryKeys()[0].getColumnName() + " AND " +
                                               "X." + _columnName + " = ?)";
                 }
@@ -387,6 +387,26 @@ public class Field
                 }
             }
         }
-        else { _set.invoke(obj, value); }
+        else 
+        {
+            if(_columnType.equals(Calendar.class)) 
+            {
+                if(value.getClass().equals(String.class))
+                {
+                    Calendar rval = Calendar.getInstance();
+                    SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    if(((String) value).length() == 10) { value = (((String) value) + " 12:00:00"); }
+                    
+                    try 
+                    {
+                        rval.setTime(f.parse(value.toString()));
+                        value = rval;
+                    }
+                    catch (Exception ex) {}
+                }
+            }
+            
+            _set.invoke(obj, value); 
+        }
     }
 }
