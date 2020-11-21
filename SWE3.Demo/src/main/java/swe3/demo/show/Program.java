@@ -19,8 +19,9 @@ public class Program
         SQLToFrameworkObjects.show();
         CreateObjectWithFK.show();
         CreateObjectWithFKList.show();
+        CreateObjectWithMToNFK.show();
         */
         
-        CreateObjectWithMToNFK.show();
+        InsertNewObjectAndUpdate.show();
     }
 }

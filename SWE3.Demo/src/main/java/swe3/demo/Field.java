@@ -262,6 +262,12 @@ public class Field
      * @return Database type representation of the value. */
     public Object toColumnType(Object obj)
     {
+        if(_isFk)
+        {
+            Field fk = World.__getEntity(_fieldType).getPrimaryKeys()[0];
+            return fk.toColumnType(fk.getValue(obj));
+        }
+        
         if(_fieldType.equals(_columnType)) { return obj; }
         
         if(obj.getClass().equals(boolean.class))

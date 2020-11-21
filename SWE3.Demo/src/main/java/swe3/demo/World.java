@@ -295,4 +295,75 @@ public final class World
         
         return rval.toArray((T[]) Array.newInstance(t, 0));
     }
+    
+    
+    /** Saves an object.
+     * @param obj Object. */
+    public static void save(Object obj) throws Exception
+    {
+        Entity ent = __getEntity(obj);
+        
+        String xstmnt = ("INSERT INTO " + ent.getTableName() + " (");
+        String update    = "ON CONFLICT (";
+        String insert = "";
+        ArrayList<Object> pam1 = new ArrayList<>();
+        ArrayList<Object> pam2 = new ArrayList<>();
+        
+        for(int i = 0; i < ent.getPrimaryKeys().length; i++)
+        {
+            if(i > 0) { update += ", "; }
+            update += ent.getPrimaryKeys()[i].getColumnName();
+        }
+        update += ") DO UPDATE SET ";
+        
+        boolean first = true;
+        for(int i = 0; i < ent.getInternals().length; i++)
+        {
+            if(i > 0) { xstmnt += ", "; insert += ","; }
+            xstmnt += ent.getInternals()[i].getColumnName();
+            insert += "?";
+            pam1.add(ent.getInternals()[i].toColumnType(ent.getInternals()[i].getValue(obj)));
+            
+            if(!ent.getInternals()[i].isPrimaryKey())
+            {
+                if(first) { first = false; } else { update += ", "; }
+                update += (ent.getInternals()[i].getColumnName() + " = ?");
+                pam2.add(ent.getInternals()[i].toColumnType(ent.getInternals()[i].getValue(obj)));
+            }
+        }
+        xstmnt += (") VALUES (" + insert + ") " + update);        
+        pam1.addAll(pam2);
+        
+        PreparedStatement cmd = getConnection().prepareStatement(xstmnt);
+        int n = 1;
+        for(Object i: pam1) { cmd.setObject(n++, i); }
+        
+        cmd.execute();
+        cmd.close();
+    }
+    
+    
+    /** Deletes an object.
+     * @param obj Object. */
+    public static void delete(Object obj) throws Exception
+    {
+        Entity ent = __getEntity(obj);
+        
+        String xstmnt = ("DELETE FROM " + ent.getTableName() + " WHERE ");
+        ArrayList<Object> params = new ArrayList<>();
+        
+        for(int i = 0; i < ent.getPrimaryKeys().length; i++)
+        {
+            if(i > 0) { xstmnt += " AND "; }
+            xstmnt += (ent.getPrimaryKeys()[i].getColumnName() + " = ?");
+            params.add(ent.getPrimaryKeys()[i].toColumnType(ent.getPrimaryKeys()[i].getValue(obj)));
+        }
+        
+        PreparedStatement cmd = getConnection().prepareStatement(xstmnt);
+        int n = 1;
+        for(Object i: params) { cmd.setObject(n++, i); }
+        
+        cmd.execute();
+        cmd.close();
+    }
 }
