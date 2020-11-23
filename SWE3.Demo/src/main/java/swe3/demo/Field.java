@@ -1,6 +1,7 @@
 package swe3.demo;
 
 import java.lang.reflect.Method;
+import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -52,6 +53,9 @@ public class Field
     
     /** m:n flag. */
     private boolean _isManyToMany = false;
+        
+    /** Nullable flag. */
+    private boolean _isNullable = false;
     
     
     
@@ -257,6 +261,22 @@ public class Field
     }
     
     
+    /** Gets if the field is nullable.
+     * @return Returns TRUE if the field is nullable, otherwise returns FALSE. */
+    public boolean isNullable()
+    {
+        return _isNullable;
+    }
+    
+    
+    /** Sets if the field is nullable.
+     * @param value Nullable flag. */
+    public void setNullable(boolean value)
+    {
+        _isNullable = value;
+    }
+    
+    
     /** Returns a database column type equivalent for a field type value.
      * @param obj Object.
      * @return Database type representation of the value. */
@@ -266,6 +286,12 @@ public class Field
         {
             Field fk = World.__getEntity(_fieldType).getPrimaryKeys()[0];
             return fk.toColumnType(fk.getValue(obj));
+        }
+        
+        if(_columnType.equals(Calendar.class))
+        {
+            SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return f.format(((Calendar) obj).getTime());
         }
         
         if(_fieldType.equals(_columnType)) { return obj; }
@@ -389,7 +415,8 @@ public class Field
                 }
                 else
                 {
-                    _set.invoke(obj, World._createObject(_fieldType, new Object[] { World.__getEntity(_fieldType).getPrimaryKeys()[0].toFieldType(value) }, objects));
+                    if(!value.equals(_fieldType)) { value = World._createObject(_fieldType, new Object[] { World.__getEntity(_fieldType).getPrimaryKeys()[0].toFieldType(value) }, objects); }
+                    _set.invoke(obj, value);
                 }
             }
         }
@@ -413,6 +440,55 @@ public class Field
             }
             
             _set.invoke(obj, value); 
+        }
+    }
+    
+    
+    /** Saves the references.
+     * @param obj Object. */
+    public void saveReferences(Object obj) throws Exception
+    {
+        if(!_isExternal) return;
+        
+        Entity innerEntity = World.__getEntity(_columnType);
+        Object myPk = _entity.getPrimaryKeys()[0].toColumnType(_entity.getPrimaryKeys()[0].getValue(obj));
+        
+        if(_isManyToMany)
+        {
+            PreparedStatement cmd = World.getConnection().prepareStatement("DELETE FROM " + _assignmentTable + " WHERE " + _columnName + " = ?");
+            cmd.setObject(1, myPk);
+            cmd.execute();
+            cmd.close();
+            
+            for(Object i: (Iterable) getValue(obj))
+            {
+                cmd = World.getConnection().prepareStatement("INSERT INTO " + _assignmentTable + "(" + _columnName + ", " + _remoteColumnName + ") VALUES (?, ?)");
+                cmd.setObject(1, myPk);
+                cmd.setObject(2, innerEntity.getPrimaryKeys()[0].toColumnType(innerEntity.getPrimaryKeys()[0].getValue(i)));
+                cmd.execute();
+                cmd.close();
+            }
+        }
+        else
+        {
+            Field remoteField = innerEntity.getFieldForColumn(_columnName);
+            
+            if(remoteField.isNullable())
+            {
+                PreparedStatement cmd = World.getConnection().prepareStatement("UPDATE " + innerEntity.getTableName() + " SET " + _columnName + " = NULL WHERE " + _columnName + " = ?");
+                cmd.setObject(1, myPk);
+                cmd.execute();
+                cmd.close();
+            }
+            
+            for(Object i: (Iterable) getValue(obj))
+            {
+                PreparedStatement cmd = World.getConnection().prepareStatement("UPDATE " + innerEntity.getTableName() + " SET " + _columnName + " = ? WHERE " + innerEntity.getPrimaryKeys()[0].getColumnName() + " = ?");
+                cmd.setObject(1, myPk);
+                cmd.setObject(2, innerEntity.getPrimaryKeys()[0].toColumnType(innerEntity.getPrimaryKeys()[0].getValue(i)));
+                cmd.execute();
+                cmd.close();
+            }
         }
     }
 }

@@ -56,6 +56,10 @@ public final class World
                 for(Field i: __getEntity(t).getFields())
                 {
                     fld = i;
+                    if(i.getName().contains("Hire"))
+                    {
+                        int zzz = 0;
+                    }
                     if(!i.isPrimaryKey())
                     {
                         i.setValue(rval, i.toFieldType(re.getObject(i.isExternal() ? i.getEntity().getPrimaryKeys()[0].getColumnName() : i.getColumnName())));
@@ -340,6 +344,8 @@ public final class World
         
         cmd.execute();
         cmd.close();
+        
+        for(Field i: ent.getExternals()) { i.saveReferences(obj); }
     }
     
     

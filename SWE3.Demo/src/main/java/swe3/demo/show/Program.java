@@ -20,8 +20,9 @@ public class Program
         CreateObjectWithFK.show();
         CreateObjectWithFKList.show();
         CreateObjectWithMToNFK.show();
+        InsertNewObjectAndUpdate.show();
         */
         
-        InsertNewObjectAndUpdate.show();
+        SaveObjectsWithLists.show();
     }
 }

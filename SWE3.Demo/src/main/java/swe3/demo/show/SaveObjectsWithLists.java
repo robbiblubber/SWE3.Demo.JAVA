@@ -5,8 +5,8 @@ import swe3.demo.test.*;
 
 
 
-/** This class shows how to insert and update an object. */
-public class InsertNewObjectAndUpdate 
+/** This class shows how to add and remove objects from lists. */
+public class SaveObjectsWithLists 
 {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // public static methods                                                                                            //
@@ -21,26 +21,31 @@ public class InsertNewObjectAndUpdate
         } 
         catch (Exception ex) {}
         
-        Course c = new Course();
-        c.setID("X100");
-        c.setName("A New Hope");
-        c.setTeacher(World.getObject(Teacher.class, "T0"));
+        Teacher t = World.getObject(Teacher.class, "T0");                       // 1:n
+        Course c;
+        t.getCourses().add(c = World.getObject(Course.class, "X2"));
+        
         try 
         {
-            World.save(c);
+            World.save(t);
         } 
         catch (Exception ex) {}
         
         c.setTeacher(World.getObject(Teacher.class, "T2"));
+        
+        c.getStudents().add(World.getObject(Student.class, "Z0"));              // m:n
+        c.getStudents().add(World.getObject(Student.class, "Z1"));
+        
         try 
         {
             World.save(c);
         } 
         catch (Exception ex) {}
         
+        c.getStudents().clear();
         try 
         {
-            World.delete(c);
+            World.save(c);
         } 
         catch (Exception ex) {}
     }

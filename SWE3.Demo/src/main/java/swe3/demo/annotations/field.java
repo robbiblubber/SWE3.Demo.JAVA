@@ -16,4 +16,7 @@ public @interface field
     
     /** Column type. */
     public Class columnType() default Void.class;
+    
+    /** Nullable flag. */
+    public boolean nullable() default false;
 }

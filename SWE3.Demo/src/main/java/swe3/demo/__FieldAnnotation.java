@@ -37,6 +37,9 @@ final class __FieldAnnotation
     /** Foreign key flag. */
     private boolean _isFk = false;
     
+    /** Nullable flag. */
+    private boolean _isNullable = false;
+    
     
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +57,7 @@ final class __FieldAnnotation
             if((fann.fieldName()  != null) && (!fann.fieldName().equals("")))  { _fieldName = fann.fieldName(); }
             if((fann.columnName() != null) && (!fann.columnName().equals(""))) { _columnName = fann.columnName(); }
             if((fann.columnType() != null) && (!fann.columnType().equals(Void.class))) { _columnType = fann.columnType(); }
+            if(fann.nullable()) { _isNullable = true; }
         }
         
         pk pkann = m.getAnnotation(pk.class);
@@ -72,6 +76,7 @@ final class __FieldAnnotation
             if((fkann.fieldName()  != null) && (!fkann.fieldName().equals(""))) { _fieldName = fkann.fieldName(); }
             if((fkann.columnName() != null) && (!fkann.columnName().equals(""))) { _columnName = fkann.columnName(); }
             if((fkann.columnType() != null) && (!fkann.columnType().equals(Void.class))) { _columnType = fkann.columnType(); }
+            if(fkann.nullable()) { _isNullable = true; }
             
             _assignmentTable = fkann.assignmentTable();
             _remoteColumnName = fkann.remoteColumnName();
@@ -118,7 +123,7 @@ final class __FieldAnnotation
     
     /** Gets if a foreign key is m:n.
      * @return Returns TRUE for m:n, otherwise returns FALSE. */
-    public boolean getManyToMany()
+    public boolean isManyToMany()
     {
         return (!((_assignmentTable == null) || (_assignmentTable.trim().equals(""))));
     }
@@ -153,5 +158,13 @@ final class __FieldAnnotation
     public boolean isForeignKey()
     {
         return _isFk;
+    }
+    
+    
+    /** Gets if the field is nullable.
+     * @return Returns TRUE for nullable fields, otherwise FALSE. */
+    public boolean isNullable()
+    {
+        return _isNullable;
     }
 }

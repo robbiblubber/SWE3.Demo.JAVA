@@ -23,4 +23,7 @@ public @interface fk
         
     /** Remote column name. */
     public String remoteColumnName() default "";
+    
+    /** Nullable flag. */
+    public boolean nullable() default false;
 }

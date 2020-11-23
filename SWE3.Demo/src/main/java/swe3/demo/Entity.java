@@ -71,6 +71,8 @@ public final class Entity
                 f.setColumnType(fattr.getColumnType());
             }
             
+            if(fattr.isNullable()) { f.setNullable(true); }
+            
             if(i.getParameters().length == 0)
             {
                 f.setGetMethod(i);
@@ -94,7 +96,7 @@ public final class Entity
             if(fattr.isForeignKey())
             {
                 f.setForeignKey(true);
-                if(fattr.getManyToMany()) { f.setManyToMany(true); }
+                if(fattr.isManyToMany()) { f.setManyToMany(true); }
                 
                 f.setExternal(Iterable.class.isAssignableFrom(f.getFieldType()));
                 if((fattr.getAssignmentTable() != null) && (!fattr.getAssignmentTable().trim().equals(""))) f.setAssignmentTable(fattr.getAssignmentTable());
@@ -247,5 +249,20 @@ public final class Entity
         rval += (" FROM " + _tableName);
         
         return rval;
+    }
+    
+    
+    /** Gets a field by its column name.
+     * @param columnName Column name.
+     * @return Field. */
+    public Field getFieldForColumn(String columnName)
+    {
+        columnName = columnName.toUpperCase();
+        for(Field i: _internals)
+        {
+            if(i.getColumnName().toUpperCase().equals(columnName)) { return i; }
+        }
+        
+        return null;
     }
 }
