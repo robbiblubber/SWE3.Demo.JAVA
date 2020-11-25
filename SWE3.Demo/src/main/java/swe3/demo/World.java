@@ -25,11 +25,35 @@ public final class World
     /** Database connection. */
     private static Connection _connection;
     
+    /** Caches. */
+    private static HashMap<Class, Cache> _caches = new HashMap<>();
+    
+    /** Empty cache. */
+    private static NullCache _nullCache = new NullCache();
+    
+    /** Caching enabled flag. */
+    private static boolean _cachingEnabled = true;
+    
     
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // protected static methods                                                                                         //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    /** Gets the cache for a type.
+     * @param t Type.
+     * @return Cache. */
+    protected static Cache _getCache(Class t)
+    {
+        if(!_cachingEnabled) { return _nullCache; }
+        
+        if(!_caches.containsKey(t))
+        {
+            _caches.put(t, new Cache());
+        }
+        return _caches.get(t);
+    }
+    
     
     /** Creates an object from a database result set.
      * @param t Type.
@@ -40,7 +64,6 @@ public final class World
     {
         Object rval = _getCachedObject(t, re, objects);
         
-        Field fld = null;
         if(rval == null)
         {
             if(objects == null) { objects = new ArrayList<>(); }
@@ -55,21 +78,15 @@ public final class World
                 
                 for(Field i: __getEntity(t).getFields())
                 {
-                    fld = i;
-                    if(i.getName().contains("Hire"))
-                    {
-                        int zzz = 0;
-                    }
                     if(!i.isPrimaryKey())
                     {
                         i.setValue(rval, i.toFieldType(re.getObject(i.isExternal() ? i.getEntity().getPrimaryKeys()[0].getColumnName() : i.getColumnName())));
                     }
                 }
+                
+                _getCache(t).set(__getEntity(rval).getPrimaryKeys()[0].getValue(rval), rval);
             } 
-            catch (Exception ex) 
-            { 
-                return null; 
-            }
+            catch (Exception ex) { return null; }
         }
         return rval;
     }
@@ -129,22 +146,31 @@ public final class World
      * @return Returns the cached object that matches the current reader or NULL if no such object has been found. */
     protected static Object _getCachedObject(Class t, ResultSet re, Collection<Object> objects)
     {
-        if(objects == null) { return null; }
-        for(Object i: objects)
+        if(objects != null)
         {
-            if(!i.getClass().equals(t)) continue;
-            
-            boolean found = true;
-            for(Field k: __getEntity(t).getPrimaryKeys())
+            for(Object i: objects)
             {
-                try 
+                if(!i.getClass().equals(t)) continue;
+
+                boolean found = true;
+                for(Field k: __getEntity(t).getPrimaryKeys())
                 {
-                    if(!k.getValue(i).equals(k.toFieldType(re.getObject(k.getColumnName())))) { found = false; break; }
-                } 
-                catch(Exception ex) { found = false; break; }
+                    try 
+                    {
+                        if(!k.getValue(i).equals(k.toFieldType(re.getObject(k.getColumnName())))) { found = false; break; }
+                    } 
+                    catch(Exception ex) { found = false; break; }
+                }
+                if(found) { return i; }
             }
-            if(found) { return i; }
         }
+        
+        try
+        {
+            Field pk = __getEntity(t).getPrimaryKeys()[0];
+            return _getCache(t).get(pk.toFieldType(re.getObject(pk.getColumnName())));
+        }
+        catch(Exception ex) {}
         
         return null;
     }
@@ -252,6 +278,36 @@ public final class World
     }
     
     
+    /** Gets if caching is enabled.
+     * @return Returns TRUE if caching is enabled, otherwise returns FALSE. */
+    public static boolean isCachingEnabled()
+    {
+        return _cachingEnabled;
+    }
+    
+    
+    /** Sets the caching enabled flag.
+     * @param value Value. */
+    public static void setCachingEnabled(boolean value)
+    {
+        _cachingEnabled = value;
+    }
+    
+    
+    /** Enables caching. */
+    public static void enableCaching()
+    {
+        setCachingEnabled(true);
+    }
+    
+    
+    /** Disables caching. */
+    public static void disableCaching()
+    {
+        setCachingEnabled(false);
+    }
+    
+    
     /** Connects to a database.
      * @param url Connection URL. */
     public static void connect(String url) throws SQLException
@@ -346,6 +402,8 @@ public final class World
         cmd.close();
         
         for(Field i: ent.getExternals()) { i.saveReferences(obj); }
+        
+        _getCache(obj.getClass()).set(ent.getPrimaryKeys()[0].getValue(obj), obj);
     }
     
     
@@ -371,5 +429,7 @@ public final class World
         
         cmd.execute();
         cmd.close();
+        
+        _getCache(obj.getClass()).delete(ent.getPrimaryKeys()[0].getValue(obj));
     }
 }

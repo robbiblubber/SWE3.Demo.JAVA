@@ -9,6 +9,15 @@ import swe3.demo.annotations.*;
 public class Person 
 {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // protected static members                                                                                         //
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    /** Instance number counter. */
+    protected static int _N = 1;
+    
+    
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // protected members                                                                                                //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
@@ -26,6 +35,9 @@ public class Person
     
     /** Gender. */
     protected Gender _gender;
+    
+    /** Instance number. */
+    protected int _instanceNumber = _N++;
     
     
     
@@ -115,5 +127,14 @@ public class Person
     public void setGender(Gender value)
     {
         _gender = value;
+    }
+    
+    
+    /** Gets the instance number.
+     * @return Instance number. */
+    @ignore
+    public int getInstanceNumber()
+    {
+        return _instanceNumber;
     }
 }
