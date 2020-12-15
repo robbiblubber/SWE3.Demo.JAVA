@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Random;
 
 
 
@@ -33,6 +34,9 @@ public final class World
     
     /** Caching enabled flag. */
     private static boolean _cachingEnabled = true;
+    
+    /** Owner key. */
+    private static String _ownerKey = Integer.toString(100000 + new Random().nextInt(899999));
     
     
     
@@ -262,6 +266,14 @@ public final class World
     }
     
     
+    /** Gets this world's owner key.
+     * @return Owner key. */
+    public static String getOwnerKey()
+    {
+        return _ownerKey;
+    }
+    
+    
     /** Gets the database connection.
      * @return Connection. */
     public static Connection getConnection()
@@ -431,5 +443,81 @@ public final class World
         cmd.close();
         
         _getCache(obj.getClass()).delete(ent.getPrimaryKeys()[0].getValue(obj));
+    }
+    
+    
+    /** Locks an object.
+     * @param obj Object.
+     * @throws ObjectLockedException Thrown when the object is locked. */
+    public static void lock(Object obj) throws ObjectLockedException
+    {
+        boolean success = true;
+        try 
+        {
+            PreparedStatement cmd = getConnection().prepareStatement("INSERT INTO LOCKS (OWNER_KEY, TYPE_KEY, OBJECT_ID) VALUES (?, ?, ?)");
+            cmd.setObject(1, _ownerKey);
+            cmd.setObject(2, __getEntity(obj).getTableName());
+            cmd.setObject(3, __getEntity(obj).getPrimaryKeys()[0].getValue(obj).toString());
+            
+            cmd.execute();
+            cmd.close();
+        } 
+        catch(Exception ex) { success = false; }
+        
+        if(!success)
+        {
+            String owner = isLockedBy(obj);
+            if(!_ownerKey.equals(owner)) { throw new ObjectLockedException(owner); }
+        }
+    }
+    
+    
+    /** Returns the owner key that locks an object.
+     * @param obj Object.
+     * @return Returns TRUE if the object is locked (by another owner), otherwise returns NULL. */
+    public static String isLockedBy(Object obj)
+    {
+        String rval = null;
+        try 
+        {
+            PreparedStatement cmd = getConnection().prepareStatement("SELECT OWNER_KEY FROM LOCKS WHERE TYPE_KEY = ? AND OBJECT_ID = ?");
+            cmd.setObject(2, __getEntity(obj).getTableName());
+            cmd.setObject(3, __getEntity(obj).getPrimaryKeys()[0].getValue(obj).toString());
+            
+            ResultSet re = cmd.executeQuery();
+            if(re.next()) { rval = re.getString(0); }
+            re.close();
+            cmd.close();
+        } 
+        catch(Exception ex) {}
+        
+        return rval;
+    }
+    
+    
+    /** Returns the if an object is locked.
+     * @param obj Object.
+     * @return Returns TRUE if the object is locked (by another owner), otherwise returns NULL. */
+    public static boolean isLocked(Object obj)
+    {
+        return (!_ownerKey.equals(isLockedBy(obj)));
+    }
+    
+    
+    /** Releases a lock on an object.
+     * @param obj Object. */
+    public static void releaseLock(Object obj)
+    {
+        try 
+        {
+            PreparedStatement cmd = getConnection().prepareStatement("DELETE FROM LOCKS WHERE OWNER_KEY = ? AND TYPE_KEY = ? AND OBJECT_ID = ?");
+            cmd.setObject(1, _ownerKey);
+            cmd.setObject(2, __getEntity(obj).getTableName());
+            cmd.setObject(3, __getEntity(obj).getPrimaryKeys()[0].getValue(obj).toString());
+            
+            cmd.execute();
+            cmd.close();
+        } 
+        catch(Exception ex) {}
     }
 }
